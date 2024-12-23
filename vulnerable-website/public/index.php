@@ -50,6 +50,30 @@ try {
 } catch (Exception $e) {
     echo "<p>Error fetching news: " . $e->getMessage() . "</p>";
 }
+
+// After loading news items, filter based on search
+$searchQuery = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
+if ($searchQuery !== '') {
+    $newsItems = array_filter($newsItems, function($news) use ($searchQuery) {
+        return strpos(strtolower($news['title']), $searchQuery) !== false || 
+               strpos(strtolower($news['description']), $searchQuery) !== false;
+    });
+}
+
+// Pagination logic
+$itemsPerPage = 5;
+$currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$totalPages = ceil(count($newsItems) / $itemsPerPage);
+$currentPage = max(1, min($currentPage, $totalPages));
+$offset = ($currentPage - 1) * $itemsPerPage;
+
+// Calculate visible page numbers
+$visiblePages = 5;
+$startPage = max(1, min($currentPage - floor($visiblePages/2), $totalPages - $visiblePages + 1));
+$endPage = min($startPage + $visiblePages - 1, $totalPages);
+
+// Slice the news items array for current page
+$currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +87,23 @@ try {
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        .search-form-nav {
+            margin: 0;
+        }
+        .container-main {
+            padding-top: 80px;
         }
         .carousel-item {
             position: relative;
@@ -141,14 +181,32 @@ try {
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Turkish Financial News</h1>
-        
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">
+                Turkish Financial News
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <form method="GET" action="index.php" class="form-inline my-2 my-lg-0 search-form-nav">
+                    <input type="text" name="search" class="form-control mr-sm-2" placeholder="Search ...">
+                    <button type="submit" class="btn btn-outline-primary my-2 my-sm-0">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container container-main">
         <!-- Carousel for featured news -->
         <div id="newsCarousel" class="carousel slide mb-4" data-ride="carousel">
             <ol class="carousel-indicators">
                 <?php
-                for($i = 0; $i < count($newsItems); $i++) {
+                $carouselLimit = 10;
+                for($i = 0; $i < min(count($newsItems), $carouselLimit); $i++) {
                     echo "<li data-target='#newsCarousel' data-slide-to='{$i}' " . ($i == 0 ? "class='active'" : "") . "></li>";
                 }
                 ?>
@@ -156,7 +214,10 @@ try {
             <div class="carousel-inner">
                 <?php
                 $isActive = true;
+                $count = 0;
                 foreach ($newsItems as $news) {
+                    if ($count >= $carouselLimit) break;
+                    
                     if ($isActive) {
                         echo "<div class='carousel-item active'>
                                 <img src='{$news['image']}' class='d-block w-100' alt='News Image'>
@@ -175,6 +236,7 @@ try {
                                 </div>
                               </div>";
                     }
+                    $count++;
                 }
                 ?>
             </div>
@@ -188,18 +250,12 @@ try {
             </a>
         </div>
 
-        <!-- Search form -->
-        <form method="GET" action="index.php" class="form-inline my-4 justify-content-center">
-            <input type="text" name="search" class="form-control mr-2" placeholder="Search news...">
-            <button type="submit" class="btn btn-primary">Search</button>
-        </form>
-
         <!-- News list -->
         <div class="news-list">
             <?php
             $searchQuery = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
-            if (!empty($newsItems)) {
-                foreach ($newsItems as $news) {
+            if (!empty($currentNewsItems)) {
+                foreach ($currentNewsItems as $news) {
                     if ($searchQuery === '' || strpos(strtolower($news['title']), $searchQuery) !== false || strpos(strtolower($news['description']), $searchQuery) !== false) {
                         echo "<div class='card mb-3'>
                                 <div class='row no-gutters'>
@@ -217,6 +273,44 @@ try {
                               </div>";
                     }
                 }
+            ?>
+                <!-- Add pagination -->
+                <nav aria-label="News pagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?php echo $currentPage <= 1 ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $currentPage-1; ?><?php echo $searchQuery ? '&search='.$searchQuery : ''; ?>">Previous</a>
+                        </li>
+                        
+                        <?php if($startPage > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1<?php echo $searchQuery ? '&search='.$searchQuery : ''; ?>">1</a>
+                            </li>
+                            <?php if($startPage > 2): ?>
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                        <?php for($i = $startPage; $i <= $endPage; $i++): ?>
+                            <li class="page-item <?php echo $currentPage == $i ? 'active' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $i; ?><?php echo $searchQuery ? '&search='.$searchQuery : ''; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <?php if($endPage < $totalPages): ?>
+                            <?php if($endPage < $totalPages - 1): ?>
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <?php endif; ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?php echo $totalPages; ?><?php echo $searchQuery ? '&search='.$searchQuery : ''; ?>"><?php echo $totalPages; ?></a>
+                            </li>
+                        <?php endif; ?>
+
+                        <li class="page-item <?php echo $currentPage >= $totalPages ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $currentPage+1; ?><?php echo $searchQuery ? '&search='.$searchQuery : ''; ?>">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            <?php
             } else {
                 echo "<p class='text-center'>No news available at the moment.</p>";
             }
