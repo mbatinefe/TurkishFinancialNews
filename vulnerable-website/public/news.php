@@ -48,7 +48,41 @@ while ($row = $result->fetch_assoc()) {
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Copy existing styles from index.php */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        .search-form-nav {
+            margin: 0;
+        }
+        .container-main {
+            padding-top: 80px;
+        }
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+        }
+        .nav-item.dropdown .nav-link {
+            color: #333;
+        }
+        @media (max-width: 991px) {
+            .auth-buttons {
+                margin-top: 1rem;
+            }
+            .search-form-nav {
+                margin-bottom: 1rem;
+            }
+        }
         .news-content {
             background: white;
             padding: 30px;
@@ -69,7 +103,7 @@ while ($row = $result->fetch_assoc()) {
     </style>
 </head>
 <body>
-    <!-- Copy navbar from index.php -->
+    <?php include 'navbar.php'; ?>
     
     <div class="container container-main">
         <div class="news-content">
@@ -109,6 +143,8 @@ while ($row = $result->fetch_assoc()) {
         </div>
     </div>
 
-    <!-- Copy scripts from index.php -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

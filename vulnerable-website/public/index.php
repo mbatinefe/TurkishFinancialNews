@@ -192,99 +192,65 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top navbar-light">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                Turkish Financial News
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <form method="GET" action="index.php" class="form-inline my-2 my-lg-0 search-form-nav mr-3">
-                    <input type="text" name="search" class="form-control mr-2" placeholder="Search ...">
-                    <button type="submit" class="btn btn-outline-primary my-2 my-sm-0">Search</button>
-                </form>
-                <?php if(isset($_SESSION['user_id'])): ?>
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
-                            <?php if($_SESSION['profile_picture']): ?>
-                                <img src="<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" 
-                                     class="rounded-circle mr-2" 
-                                     style="width: 30px; height: 30px; object-fit: cover;" 
-                                     alt="Profile">
-                            <?php endif; ?>
-                            <?php if($_SESSION['role'] == 'admin'): ?>
-                                Welcome Admin, <?php echo htmlspecialchars($_SESSION['username']); ?>
-                            <?php else: ?>
-                                Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>
-                            <?php endif; ?>
-                        </a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="logout.php">Logout</a>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <div class="auth-buttons">
-                        <a href="login.php" class="btn btn-outline-primary mr-2">Login</a>
-                        <a href="signup.php" class="btn btn-primary">Sign Up</a>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
+    <?php include 'navbar.php'; ?>
+    
     <div class="container container-main">
-        <!-- Carousel for featured news -->
-        <div id="newsCarousel" class="carousel slide mb-4" data-ride="carousel">
-            <ol class="carousel-indicators">
-                <?php
-                $carouselLimit = 10;
-                for($i = 0; $i < min(count($newsItems), $carouselLimit); $i++) {
-                    echo "<li data-target='#newsCarousel' data-slide-to='{$i}' " . ($i == 0 ? "class='active'" : "") . "></li>";
-                }
-                ?>
-            </ol>
-            <div class="carousel-inner">
-                <?php
-                $isActive = true;
-                $count = 0;
-                foreach ($newsItems as $news) {
-                    if ($count >= $carouselLimit) break;
-                    
-                    if ($isActive) {
-                        echo "<div class='carousel-item active'>
-                                <img src='{$news['image']}' class='d-block w-100' alt='News Image'>
-                                <div class='carousel-caption d-none d-md-block'>
-                                    <h5><a href='news.php?url=" . urlencode($news['link']) . "' target='_blank' class='text-white'>{$news['title']}</a></h5>
-                                    <p>{$news['description']}</p>
-                                </div>
-                              </div>";
-                        $isActive = false;
-                    } else {
-                        echo "<div class='carousel-item'>
-                                <img src='{$news['image']}' class='d-block w-100' alt='News Image'>
-                                <div class='carousel-caption d-none d-md-block'>
-                                    <h5><a href='news.php?url=" . urlencode($news['link']) . "' target='_blank' class='text-white'>{$news['title']}</a></h5>
-                                    <p>{$news['description']}</p>
-                                </div>
-                              </div>";
+        <?php if($searchQuery === ''): ?>
+            <!-- Carousel for featured news -->
+            <div id="newsCarousel" class="carousel slide mb-4" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <?php
+                    $carouselLimit = 10;
+                    for($i = 0; $i < min(count($newsItems), $carouselLimit); $i++) {
+                        echo "<li data-target='#newsCarousel' data-slide-to='{$i}' " . ($i == 0 ? "class='active'" : "") . "></li>";
                     }
-                    $count++;
-                }
-                ?>
+                    ?>
+                </ol>
+                <div class="carousel-inner">
+                    <?php
+                    $isActive = true;
+                    $count = 0;
+                    foreach ($newsItems as $news) {
+                        if ($count >= $carouselLimit) break;
+                        
+                        if ($isActive) {
+                            echo "<div class='carousel-item active'>
+                                    <img src='{$news['image']}' class='d-block w-100' alt='News Image'>
+                                    <div class='carousel-caption d-none d-md-block'>
+                                        <h5><a href='news.php?url=" . urlencode($news['link']) . "' target='_blank' class='text-white'>{$news['title']}</a></h5>
+                                        <p>{$news['description']}</p>
+                                    </div>
+                                  </div>";
+                            $isActive = false;
+                        } else {
+                            echo "<div class='carousel-item'>
+                                    <img src='{$news['image']}' class='d-block w-100' alt='News Image'>
+                                    <div class='carousel-caption d-none d-md-block'>
+                                        <h5><a href='news.php?url=" . urlencode($news['link']) . "' target='_blank' class='text-white'>{$news['title']}</a></h5>
+                                        <p>{$news['description']}</p>
+                                    </div>
+                                  </div>";
+                        }
+                        $count++;
+                    }
+                    ?>
+                </div>
+                <a class="carousel-control-prev" href="#newsCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#newsCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
             </div>
-            <a class="carousel-control-prev" href="#newsCarousel" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#newsCarousel" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
+        <?php else: ?>
+            <!-- Search results header -->
+            <div class="mb-4">
+                <h3>Search Results for: "<?php echo htmlspecialchars($searchQuery); ?>"</h3>
+                <a href="index.php" class="btn btn-outline-secondary btn-sm">Clear Search</a>
+            </div>
+        <?php endif; ?>
 
         <!-- News list -->
         <div class="news-list">
