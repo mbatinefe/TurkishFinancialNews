@@ -1,9 +1,5 @@
 <?php
-
-/*----------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See LICENSE in the project root for license information.
- *---------------------------------------------------------------------------------------*/
+session_start();
 
  // Enable error reporting for debugging (remove in production)
  ini_set('display_errors', 1);
@@ -178,6 +174,21 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+        }
+        .nav-item.dropdown .nav-link {
+            color: #333;
+        }
+        @media (max-width: 991px) {
+            .auth-buttons {
+                margin-top: 1rem;
+            }
+            .search-form-nav {
+                margin-bottom: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -191,10 +202,35 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <form method="GET" action="index.php" class="form-inline my-2 my-lg-0 search-form-nav">
-                    <input type="text" name="search" class="form-control mr-sm-2" placeholder="Search ...">
+                <form method="GET" action="index.php" class="form-inline my-2 my-lg-0 search-form-nav mr-3">
+                    <input type="text" name="search" class="form-control mr-2" placeholder="Search ...">
                     <button type="submit" class="btn btn-outline-primary my-2 my-sm-0">Search</button>
                 </form>
+                <?php if(isset($_SESSION['user_id'])): ?>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
+                            <?php if($_SESSION['profile_picture']): ?>
+                                <img src="<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" 
+                                     class="rounded-circle mr-2" 
+                                     style="width: 30px; height: 30px; object-fit: cover;" 
+                                     alt="Profile">
+                            <?php endif; ?>
+                            <?php if($_SESSION['role'] == 'admin'): ?>
+                                Welcome Admin, <?php echo htmlspecialchars($_SESSION['username']); ?>
+                            <?php else: ?>
+                                Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>
+                            <?php endif; ?>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="logout.php">Logout</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="auth-buttons">
+                        <a href="login.php" class="btn btn-outline-primary mr-2">Login</a>
+                        <a href="signup.php" class="btn btn-primary">Sign Up</a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
@@ -222,7 +258,7 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
                         echo "<div class='carousel-item active'>
                                 <img src='{$news['image']}' class='d-block w-100' alt='News Image'>
                                 <div class='carousel-caption d-none d-md-block'>
-                                    <h5><a href='{$news['link']}' target='_blank' class='text-white'>{$news['title']}</a></h5>
+                                    <h5><a href='news.php?url=" . urlencode($news['link']) . "' target='_blank' class='text-white'>{$news['title']}</a></h5>
                                     <p>{$news['description']}</p>
                                 </div>
                               </div>";
@@ -231,7 +267,7 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
                         echo "<div class='carousel-item'>
                                 <img src='{$news['image']}' class='d-block w-100' alt='News Image'>
                                 <div class='carousel-caption d-none d-md-block'>
-                                    <h5><a href='{$news['link']}' target='_blank' class='text-white'>{$news['title']}</a></h5>
+                                    <h5><a href='news.php?url=" . urlencode($news['link']) . "' target='_blank' class='text-white'>{$news['title']}</a></h5>
                                     <p>{$news['description']}</p>
                                 </div>
                               </div>";
@@ -264,7 +300,9 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
                                     </div>
                                     <div class='col-md-8'>
                                         <div class='card-body'>
-                                            <h5 class='card-title'><a href='{$news['link']}' target='_blank'>{$news['title']}</a></h5>
+                                            <h5 class='card-title'>
+                                                <a href='news.php?url=" . urlencode($news['link']) . "'>{$news['title']}</a>
+                                            </h5>
                                             <p class='card-text'>{$news['description']}</p>
                                             <p class='card-text'><small class='text-muted'>Published on: {$news['pubDate']}</small></p>
                                         </div>
