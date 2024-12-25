@@ -23,13 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
         $uploadfile = $uploaddir . basename($_FILES['profile_picture']['name']);
         
         /*
-        VULNERABILITY: CWE-434 Unrestricted Upload of File with Dangerous Type
-            Our $uploadfile variable is directly used in move_uploaded_file function
-            Attacker can easily manipulate the $uploadfile to upload malicious files
+            FIXED: Validate file type before uploading. We only allow JPG, PNG and GIF files
         */
-        if(move_uploaded_file($_FILES['profile_picture']['tmp_name'], $uploadfile)) {
-            $profile_picture = $uploadfile;
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        $file_type = mime_content_type($_FILES['profile_picture']['tmp_name']);
+        
+        if (in_array($file_type, $allowed_types)) {
+            if(move_uploaded_file($_FILES['profile_picture']['tmp_name'], $uploadfile)) {
+                $profile_picture = $uploadfile;
+            } else {
+                $error = "Failed to upload file.";
+            }
         }
+        /*
+            If the file type is not allowed, we do not upload the file
+            We do not give error message here to prevent leaking information
+            So, attacker will be signed-up without a profile picture
+        */
     }
     
     if ($password !== $confirm_password) {
