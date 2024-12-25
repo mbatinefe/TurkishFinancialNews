@@ -2,12 +2,6 @@
 session_start();
 require_once 'config.php';
 
-// Basic admin check
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Location: index.php');
-    exit;
-}
-
 $message = '';
 $exportFile = '';
 
@@ -43,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Vulnerable download implementation
 if (isset($_GET['file'])) {
     $requestedFile = $_GET['file'];
-    $filePath = "exports/" . str_replace(['../', '..\\'], '', $requestedFile); // Vulnerable to path traversal
+    $filePath = "exports/" . $requestedFile; // Vulnerable to path traversal
     
     if (file_exists($filePath)) {
         header('Content-Type: text/plain');
@@ -84,7 +78,8 @@ if (isset($_GET['file'])) {
     </style>
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+    <!-- Replace or adjust navbar to remove admin references -->
+    <?php include 'navbar.php'; /* e.g., remove admin checks inside navbar.php */ ?>
     
     <div class="container container-main">
         <div class="export-card">
