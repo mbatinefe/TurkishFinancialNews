@@ -1,8 +1,6 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-light">
     <div class="container">
-        <a class="navbar-brand" href="index.php">
-            Turkish Financial News
-        </a>
+        <a class="navbar-brand" href="index.php">Turkish Financial News</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -16,13 +14,17 @@
             <?php if(isset($_SESSION['user_id'])): ?>
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
-                        <?php if($_SESSION['profile_picture']): ?>
+                    <!--
+                        FIX:
+                        - Use $_SESSION instead of $_COOKIE to check the role
+                    -->    
+                    <?php if(isset($_SESSION['profile_picture']) && $_SESSION['profile_picture']): ?>
                             <img src="<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" 
                                  class="rounded-circle mr-2" 
                                  style="width: 30px; height: 30px; object-fit: cover;" 
                                  alt="Profile">
                         <?php endif; ?>
-                        <?php if($_SESSION['role'] == 'admin'): ?>
+                        <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                             Welcome Admin, <?php echo htmlspecialchars($_SESSION['username']); ?>
                         <?php else: ?>
                             Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>

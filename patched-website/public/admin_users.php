@@ -3,30 +3,32 @@ session_start();
 require_once 'config.php';
 
 /*
-    VULNERABLE: CWE-863 Incorrect Authorization
-        This is a weak authorization check that can be bypassed. 
-        The application checks if the role parameter exists in the GET request and if it is equal to admin.
-        If so, it sets the role session variable to admin. 
-        This allows an attacker to access the admin panel by providing role=admin in the URL.
+    FIXED: We use prepared statements to prevent SQL Injection
+    - We bind the user input to the SQL query
+    - We do not use the user input directly in the SQL query
 */
-// Just check if role parameter exists in GET request
-if (isset($_GET['role']) && $_GET['role'] === 'admin') {
-    $_COOKIE['role'] = 'admin'; // Allows role override
+
+// Verify user is logged in and has admin role
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: index.php');
+    exit;
 }
 
-// User can access by providing role=admin in URL
-if (!isset($_SESSION['role'])) {
-    if (isset($_GET['role']) && $_GET['role'] === 'admin') {
-        // Allow access if role=admin is in URL
-        $_SESSION['role'] = 'admin';
-    } else {
-        header('Location: index.php');
-        exit;
-    }
+// Verify admin role in database
+$verify_sql = "SELECT role FROM users WHERE id = ? AND role = 'admin'";
+$stmt = $conn->prepare($verify_sql);
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows !== 1) {
+    session_destroy();
+    header('Location: index.php');
+    exit;
 }
 
-// Fetch all users -> no additional verification
-$query = "SELECT id, username, email, password, role FROM users";
+// Fetch users only if admin verification passed
+$query = "SELECT id, username, email, role FROM users"; // Removed password from select
 $result = $conn->query($query);
 ?>
 
@@ -77,7 +79,6 @@ $result = $conn->query($query);
                         <th>ID</th>
                         <th>Username</th>
                         <th>Email</th>
-                        <th>Password Hash</th>
                         <th>Role</th>
                     </tr>
                 </thead>
@@ -87,7 +88,6 @@ $result = $conn->query($query);
                             <td><?php echo htmlspecialchars($user['id']); ?></td>
                             <td><?php echo htmlspecialchars($user['username']); ?></td>
                             <td><?php echo htmlspecialchars($user['email']); ?></td>
-                            <td><code><?php echo htmlspecialchars($user['password']); ?></code></td>
                             <td><?php echo htmlspecialchars($user['role']); ?></td>
                         </tr>
                     <?php endwhile; ?>

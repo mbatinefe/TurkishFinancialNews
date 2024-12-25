@@ -30,7 +30,12 @@
                     </a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="logout.php">Logout</a>
-                        <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                        <!--
+                            VULNERABILITY:
+                            - Only checks cookie for role, it does not check the session
+                            - An attacker can set the cookie to role=admin and access admin features
+                        -->
+                        <?php if(isset($_COOKIE['role']) && $_COOKIE['role'] === 'admin'): ?>
                             <a class="dropdown-item" href="check_feeds.php">Check News Feeds</a>
                             <a class="dropdown-item" href="admin_users.php">Manage Users</a>
                         <?php endif; ?>

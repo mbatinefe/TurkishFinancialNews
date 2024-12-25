@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
     
     // File upload handling
     $profile_picture = '';
-    if(isset($_FILES['profile_picture'])) {
+    if(isset($_FILES['profile_picture']) && $_FILES['profile_picture']['size'] > 0) {
         $uploadfile = $uploaddir . basename($_FILES['profile_picture']['name']);
         
         /*
