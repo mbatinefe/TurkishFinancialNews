@@ -4,12 +4,15 @@ require_once 'config.php';
 
 $message = '';
 $exportFile = '';
+/*
+    FIXED: Use realpath() to get the absolute path of the directory
+*/
+$exportDir = realpath('exports/'); // Get absolute path
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Create exports directory if not exists
-    $exportDir = 'exports/';
     if (!file_exists($exportDir)) {
-        mkdir($exportDir, 0777, true);
+        mkdir($exportDir, 0755, true); // More restrictive permissions
     }
 
     // Generate report
@@ -34,21 +37,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message = "Export generated successfully!";
 }
 
-// Vulnerable download implementation - allows path traversal
+// We secure download implementation
 if (isset($_GET['file'])) {
-    $requestedFile = $_GET['file'];
     /*
-    VULNERABILITY: CWE-35: Path Traversal
-        This is a path traversal vulnerability. It happens when application allow user input to navigate
-        through systems' directories. In this case, the application is using user input to download files.
-        For this it specifically exists because: 
-            str_replace() only removes ../ once, so ....// becomes ../ after the replacement.
+        FIXED: Use basename() to get the filename only
     */
-    $filePath = "exports/" . str_replace('../', '', $requestedFile);
-    // Check if the file exists and serve it
+    $requestedFile = basename($_GET['file']); // Get filename only
+    $filePath = $exportDir . DIRECTORY_SEPARATOR . $requestedFile;
+    /*
+        FIXED: Verify file is within exports directory and is .txt
+    */
+    if (realpath($filePath) === false || 
+        !str_starts_with(realpath($filePath), $exportDir) || 
+        !str_ends_with(strtolower($filePath), '.txt')) {
+        header('HTTP/1.0 403 Forbidden');
+        exit('Access Denied. Invalid file requested. Absolutely no path traversal allowed.');
+    }
+    
     if (file_exists($filePath)) {
         header('Content-Type: text/plain');
-        header('Content-Disposition: attachment; filename="' . basename($requestedFile) . '"');
+        header('Content-Disposition: attachment; filename="' . $requestedFile . '"');
         readfile($filePath);
         exit;
     }
