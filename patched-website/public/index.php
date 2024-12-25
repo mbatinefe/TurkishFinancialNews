@@ -13,17 +13,13 @@ function debug($data) {
     exit;
 }
 
-// Make phpinfo() available
+// Patched: Do not make phpinfo() available
 /*
-    VULNERABLE since it exposes sensitive information to attackers.
-    We can learn about the server configuration, PHP version, extensions and more which
-    might help attackers to do path traversal, SQL injection, or other attacks.
-    // Example: localhost/index.php?phpinfo
-*/
 if (isset($_GET['phpinfo'])) {
     phpinfo();
     exit;
 }
+*/
 
 // Fetch RSS feed from Turkish financial news source
 $newsFeedUrl = "https://www.hurriyet.com.tr/rss/ekonomi"; // Example RSS feed URL

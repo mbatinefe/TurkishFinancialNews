@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Vulnerable download implementation
 if (isset($_GET['file'])) {
     $requestedFile = $_GET['file'];
-    $filePath = "exports/" . $requestedFile; // Vulnerable to path traversal
+    $filePath = "exports/" . str_replace(['../', '..\\'], '', $requestedFile); // Vulnerable to path traversal
     
     if (file_exists($filePath)) {
         header('Content-Type: text/plain');
