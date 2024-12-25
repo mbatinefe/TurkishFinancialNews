@@ -7,7 +7,7 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Directly trust the user input with no sanitization
+    // Securely handle user input
     if (isset($_GET['email'])) {
         $email = $_GET['email'];
     } else {
@@ -17,36 +17,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email == '') {
         $error = 'Email is required.';
     } else {
-        $email = $email;
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Invalid email format.';
+        }
     }
 
     if (empty($error)) {
         /*
-        VULNERABILITY: SQL Injection
-            The $email variable is directly used in the SQL query with no sanitization
-            Attacker can manipulate $email variable to inject SQL commands
+        FIXED: Use prepared statements to prevent SQL Injection
         */
-        $q = "SELECT * FROM subscribers WHERE email = '$email'";
-        $result = mysqli_query($conn, $q);
+        $stmt = $conn->prepare("SELECT * FROM subscribers WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $success .= "Email " . htmlentities($row['email']) . " is already subscribed!<br>";
             }
         } else {
-            // Another vulnerable query for inserting user input directly
-            // But we do not come to here because first q is already vulnerable
-            $sql = "INSERT INTO subscribers (email) VALUES ('$email')";
-            if (mysqli_query($conn, $sql)) {
+            // Use prepared statement for insertion
+            $stmt = $conn->prepare("INSERT INTO subscribers (email) VALUES (?)");
+            $stmt->bind_param("s", $email);
+
+            if ($stmt->execute()) {
                 $success = 'Subscription successful.';
             } else {
                 $error = 'Subscription failed.';
             }
         }
+
+        // Close statement
+        $stmt->close();
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="btn-group w-100">
                     <button type="submit" name="action" value="subscribe" class="btn btn-primary">Subscribe Now</button>
+                    <button type="submit" name="action" value="unsubscribe" class="btn btn-danger">Unsubscribe</button>
                 </div>
             </form>
             
