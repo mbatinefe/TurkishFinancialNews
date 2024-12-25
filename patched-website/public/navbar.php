@@ -7,6 +7,7 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <a href="subscribe.php" class="btn btn-outline-success mr-3">Subscribe</a>
             <a href="export_news.php" class="btn btn-outline-info mr-3">Export News</a>
+            <a href="check_feeds.php" class="btn btn-outline-warning mr-3">Check Feeds</a>
             <form method="GET" action="index.php" class="form-inline my-2 my-lg-0 search-form-nav mr-3">
                 <input type="text" name="search" class="form-control mr-2" placeholder="Search ...">
                 <button type="submit" class="btn btn-outline-primary my-2 my-sm-0">Search</button>
@@ -33,7 +34,6 @@
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="logout.php">Logout</a>
                         <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                            <a class="dropdown-item" href="check_feeds.php">Check News Feeds</a>
                             <a class="dropdown-item" href="admin_users.php">Manage Users</a>
                         <?php endif; ?>
                     </div>

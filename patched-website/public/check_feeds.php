@@ -5,32 +5,86 @@ require_once 'config.php';
 $result = '';
 $error = '';
 
-// Vulnerable SSRF implementation
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $url = $_POST['url'];
-    try {
-        /*
-            VULNERABILITY: SSRF
-            Function uses the user-provided URL directly in a call to file_get_contents.
-            Attacker can provide a malicious URL to access internal resources or perform other malicious activities.
-        */
-        $content = file_get_contents($url);
-        $result = "Feed is accessible. Content length: " . strlen($content) . " bytes";
-    } catch (Exception $e) {
-        $error = "Failed to fetch feed: " . $e->getMessage();
-    }
+/*
+    FIX: Prevent SSRF through internal IP validation
+    - Check for private IP ranges (127.0.0.1, 10.0.0.0/8, etc.)
+    - Block access to internal network resources
+*/
+function isInternalIP($ip) {
+    return filter_var($ip, FILTER_VALIDATE_IP) && (
+        strpos($ip, '127.') === 0 || 
+        strpos($ip, '10.') === 0 || 
+        strpos($ip, '172.16.') === 0 || 
+        strpos($ip, '192.168.') === 0
+    );
+}
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /*
-        VULNERABILITY: SSRF
-        Function uses the user-provided URL directly in a call to cURL.
-        Attacker can provide a malicious URL to access internal resources or perform other malicious activities.
+        FIX: URL Validation and Sanitization
+        - Sanitize URL input
+        - Validate URL format
+        - Prevent malformed URLs
     */
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $output = curl_exec($ch);
-    curl_close($ch);
-    $result .= " | cURL content length: " . strlen($output) . " bytes";
+    $url = filter_var($_POST['url'], FILTER_SANITIZE_URL);
+    
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        $error = "Invalid URL format";
+    } else {
+        $parsed_url = parse_url($url);
+        
+        /*
+            FIX: Protocol Restriction
+            - Only allow HTTP/HTTPS protocols
+            - Block dangerous protocols (file://, ftp://, etc.)
+        */
+        if (!in_array($parsed_url['scheme'], ['http', 'https'])) {
+            $error = "Only HTTP(S) protocols are allowed";
+        } 
+        else if (isInternalIP(gethostbyname($parsed_url['host']))) {
+            $error = "Internal IP addresses are not allowed";
+        }
+        else {
+            try {
+                /*
+                    FIX: Safe Context Configuration
+                    - Set timeout to prevent long-running requests
+                    - Restrict to GET method only
+                */
+                $context = stream_context_create([
+                    'http' => [
+                        'timeout' => 5,
+                        'method' => 'GET'
+                    ]
+                ]);
+                $content = file_get_contents($url, false, $context);
+                
+                /*
+                    FIX: Secure CURL Configuration
+                    - Set protocol restrictions
+                    - Disable redirect following
+                    - Set timeout
+                    - Prevent redirect chains
+                */
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+                    CURLOPT_TIMEOUT => 5,
+                    CURLOPT_FOLLOWLOCATION => false,
+                    CURLOPT_MAXREDIRS => 0
+                ]);
+                $output = curl_exec($ch);
+                curl_close($ch);
+                
+                $result = "Feed is accessible. Content length: " . strlen($content) . " bytes";
+                $result .= " | cURL content length: " . strlen($output) . " bytes";
+            } catch (Exception $e) {
+                $error = "Failed to fetch feed: " . $e->getMessage();
+            }
+        }
+    }
 }
 ?>
 
