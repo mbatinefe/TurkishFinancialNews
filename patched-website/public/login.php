@@ -13,29 +13,36 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['login'])) {
-        // directly trusting user input without proper sanitization
-        $username = $_POST['username'];
+        //Using trim() to remove unnecessary whitespace from the username input.
+        $username = trim($_POST['username']);
         $password = $_POST['password'];
 
-        /*
-            Vulnerability: SQL Injection
-            Directly embedding user input into the SQL query makes it vulnerable to SQL injection attacks.
-            If an attacker provides malicious input such as "' OR 1=1 --", it will modify the query logic.
-        */
-        $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-        $result = $conn->query($sql);
+        // Using a parameterized query with placeholders to prevent SQL injection
+        $sql = "SELECT * FROM users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
 
-        if ($result) {
-            // Fetching user information from the result without checking if a valid user record exists.
+        // Binding user-provided data to the query in a safe manner.
+        $stmt->bind_param("s", $username);
+
+        // Executing the prepared statement and fetching the result with get_result(),
+        // which is safe and prevents SQL injection.
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Verifying if a user with the provided username exists.
+        // This ensures secure password storage and comparison.
+        if ($result->num_rows == 1) {
             $user = $result->fetch_assoc();
 
-            // If SQL injection is successful, the attacker can gain unauthorized access.
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['profile_picture'] = $user['profile_picture'];
-            header("Location: index.php");
-            exit;
+            // Using password_verify() to compare the provided password with the hashed password in the database.
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+                $_SESSION['profile_picture'] = $user['profile_picture'];
+                header("Location: index.php");
+                exit;
+            }
         }
         $error = "Invalid username or password";
     }
