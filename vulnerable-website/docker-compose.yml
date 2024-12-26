@@ -22,5 +22,18 @@ services:
       - mysql_data:/var/lib/mysql
       - ./financial_news.sql:/docker-entrypoint-initdb.d/financial_news.sql
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    container_name: phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=secret
+      - MYSQL_DATABASE=financial_news
 volumes:
   mysql_data:
