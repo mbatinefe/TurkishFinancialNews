@@ -37,3 +37,4 @@ services:
       - MYSQL_DATABASE=financial_news
 volumes:
   mysql_data:
+  news_exports:

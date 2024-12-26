@@ -22,5 +22,10 @@ COPY ./public/ /var/www/html/
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
+# Create exports directory and set permissions
+RUN mkdir -p /var/www/html/exports && \
+    chown -R www-data:www-data /var/www/html/exports && \
+    chmod 755 /var/www/html/exports
+    
 # Apache configuration
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf

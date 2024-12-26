@@ -1,8 +1,6 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-light">
     <div class="container">
-        <a class="navbar-brand" href="index.php">
-            Turkish Financial News
-        </a>
+        <a class="navbar-brand" href="index.php">Turkish Financial News</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>

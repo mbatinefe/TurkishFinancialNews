@@ -82,6 +82,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             max-width: 600px;
             margin: 0 auto;
         }
+        .admin-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .export-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -108,7 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="btn-group w-100">
                     <button type="submit" name="action" value="subscribe" class="btn btn-primary">Subscribe Now</button>
-                    <button type="submit" name="action" value="unsubscribe" class="btn btn-danger">Unsubscribe</button>
                 </div>
             </form>
             

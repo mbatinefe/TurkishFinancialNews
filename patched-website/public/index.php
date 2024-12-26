@@ -94,6 +94,7 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
         }
+        /* Navbar styles */
         .navbar {
             background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -109,6 +110,22 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
         .container-main {
             padding-top: 80px;
         }
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+        }
+        .nav-item.dropdown .nav-link {
+            color: #333;
+        }
+        @media (max-width: 991px) {
+            .auth-buttons {
+                margin-top: 1rem;
+            }
+            .search-form-nav {
+                margin-bottom: 1rem;
+            }
+        }
+        /* Existing index.php specific styles */
         .carousel-item {
             position: relative;
         }
@@ -181,21 +198,6 @@ $currentNewsItems = array_slice($newsItems, $offset, $itemsPerPage);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .auth-buttons {
-            display: flex;
-            align-items: center;
-        }
-        .nav-item.dropdown .nav-link {
-            color: #333;
-        }
-        @media (max-width: 991px) {
-            .auth-buttons {
-                margin-top: 1rem;
-            }
-            .search-form-nav {
-                margin-bottom: 1rem;
-            }
         }
     </style>
 </head>
