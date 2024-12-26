@@ -13,35 +13,39 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['login'])) {
-        $username = trim($_POST['username']);
+        // directly trusting user input without proper sanitization
+        $username = $_POST['username'];
         $password = $_POST['password'];
-        
-        $sql = "SELECT * FROM users WHERE username = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows == 1) {
+
+        /*
+            Vulnerability: SQL Injection
+            Directly embedding user input into the SQL query makes it vulnerable to SQL injection attacks.
+            If an attacker provides malicious input such as "' OR 1=1 --", it will modify the query logic.
+        */
+        $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+        $result = $conn->query($sql);
+
+        if ($result) {
+            // Fetching user information from the result without checking if a valid user record exists.
             $user = $result->fetch_assoc();
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['profile_picture'] = $user['profile_picture'];
-                header("Location: index.php");
-                exit;
-            }
+
+            // If SQL injection is successful, the attacker can gain unauthorized access.
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['profile_picture'] = $user['profile_picture'];
+            header("Location: index.php");
+            exit;
         }
         $error = "Invalid username or password";
     }
-    
+
     if (isset($_POST['register'])) {
         $username = trim($_POST['username']);
         $email = trim($_POST['email']);
         $password = $_POST['password'];
         $confirm_password = $_POST['confirm_password'];
-        
+
         if ($password !== $confirm_password) {
             $error = "Passwords do not match";
         } else {
@@ -49,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sss", $username, $email, $hashed_password);
-            
+
             if ($stmt->execute()) {
                 $success = "Registration successful. Please login.";
             } else {
@@ -62,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,33 +79,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             display: flex;
             align-items: center;
         }
+
         .auth-container {
             max-width: 400px;
             margin: 0 auto;
             padding: 20px;
         }
+
         .auth-card {
             background: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         .navigation-links {
             text-align: center;
             margin-top: 20px;
         }
     </style>
 </head>
+
 <body>
     <div class="container auth-container">
         <div class="auth-card">
             <h2 class="text-center mb-4">Login</h2>
-            
-            <?php if($error): ?>
+
+            <?php if ($error): ?>
                 <div class="alert alert-danger"><?php echo $error; ?></div>
             <?php endif; ?>
 
-            <?php if($success): ?>
+            <?php if ($success): ?>
                 <div class="alert alert-success"><?php echo $success; ?></div>
             <?php endif; ?>
 
@@ -127,4 +136,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>

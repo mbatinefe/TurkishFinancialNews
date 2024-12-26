@@ -35,11 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
     if ($password !== $confirm_password) {
         $error = "Passwords do not match";
     } else {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        // Update SQL to include profile picture
+        // Remove password hashing, store plain text
         $sql = "INSERT INTO users (username, email, password, profile_picture) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssss", $username, $email, $hashed_password, $profile_picture);
+        $stmt->bind_param("ssss", $username, $email, $password, $profile_picture);
         
         if ($stmt->execute()) {
             $_SESSION['register_success'] = true;
