@@ -49,7 +49,7 @@ This project simulates a Turkish financial news website with several intentional
    ```
 2. Any user who views the page where this comment is displayed will execute the script in their browser.
 
---
+-- & & & -- & & & -- & & & -- & & & --
    
 ### **SQL Injection 1**
    - **Category:** Injection (OWASP Top 10 - A03:2021)
@@ -67,7 +67,7 @@ This project simulates a Turkish financial news website with several intentional
 3. This query bypasses authentication by always evaluating OR 1=1 as TRUE.
 4.	Log in as the first user in the database.
 
---
+-- & & & -- & & & -- & & & -- & & & --
 
 ### **SQL Injection 2**
    - **Category:** Injection (OWASP Top 10 - A03:2021)
@@ -83,7 +83,7 @@ This project simulates a Turkish financial news website with several intentional
    ```
 3. Gain unauthorized access to all subscriber data.
 
---
+-- & & & -- & & & -- & & & -- & & & --
 
 ### **Incorrect Authorization**
    - **Category:**  Broken Access Control (OWASP Top 10 - A01:2021)
@@ -99,7 +99,7 @@ This project simulates a Turkish financial news website with several intentional
 3. Refresh the page to reveal the admin links.
 4. Navigate to `admin_users.php` to access sensitive information such as user data.
 
---
+-- & & & -- & & & -- & & & -- & & & --
 
 ### **Server-Side Request Forgery (SSRF)**
    - **Category:** Server-Side Request Forgery (OWASP Top 10 - A10:2021)
@@ -113,7 +113,7 @@ This project simulates a Turkish financial news website with several intentional
    `ANY WEBSITE LINK YOU WISH`
 2.	Access sensitive content such as internal services or server files.
 
---
+-- & & & -- & & & -- & & & -- & & & --
 
 ### **Unrestricted File Upload**
    - **Category:** Broken Access Control (OWASP Top 10 - A01:2021)
@@ -131,7 +131,7 @@ This project simulates a Turkish financial news website with several intentional
 2. Access the uploaded file via:
    `http://localhost/uploads/CREATED_NAME_OF_PHP.php`
 
---
+-- & & & -- & & & -- & & & -- & & & --
 
 ### **Path Traversal**
    - **Category:** Broken Access Control (OWASP Top 10 2021 - A01:2021)
@@ -145,7 +145,6 @@ This project simulates a Turkish financial news website with several intentional
    `http://localhost/export_news.php?file=....//navbar.php`
 3. Retrieve and download the respective files.
 
--- 
 
 ## Database Configuration
 
