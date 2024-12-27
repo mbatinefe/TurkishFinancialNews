@@ -12,8 +12,6 @@ This project is intended solely for educational and research purposes. It demons
 4. [Database Configuration](#database-configuration)
 5. [References](#references)
 
----
-
 ## Project Overview
 
 This project simulates a Turkish financial news website with several intentional vulnerabilities:
@@ -24,7 +22,6 @@ This project simulates a Turkish financial news website with several intentional
 - **Unrestricted File Upload (CWE-434)**
 - **Path Traversal (CWE-35)**
 
----
 
 ## Setup Instructions
 
