@@ -41,40 +41,67 @@ This project simulates a Turkish financial news website with several intentional
    - **Category:** Injection (OWASP Top 10 - A03:2021)
    - **File:** `news.php`
    - **Exploit:** Malicious JavaScript injected in user comments.
-   - **Mitigation:** Use `htmlspecialchars()` to sanitize output.
 
 2. **SQL Injection 1**
    - **Category:** Injection (OWASP Top 10 - A03:2021)
    - **Files:** `subscribe.php`
    - **Exploit:** Unsanitized inputs allow malicious SQL queries.
-   - **Mitigation:** Implement prepared statements and input validation.
 
 3. **SQL Injection 2**
    - **Category:** Injection (OWASP Top 10 - A03:2021)
    - **Files:** `login.php`
    - **Exploit:** Unsanitized inputs allow malicious SQL queries.
-   - **Mitigation:** Implement prepared statements and input validation.
     
 4. **Incorrect Authorization**
    - **Category:**  Broken Access Control (OWASP Top 10 - A01:2021)
    - **Files:** `navbar.php`, `admin_users.php`
    - **Exploit:** Role-based access control bypass using cookie manipulation.
-   - **Mitigation:** Use server-side session validation and restrict direct user access.
 
 6. **Server-Side Request Forgery (SSRF)**
    - **Category:** Server-Side Request Forgery (OWASP Top 10 - A10:2021)
    - **File:** `check_feeds.php`
    - **Exploit:** Unvalidated URL input allows access to internal resources.
-   - **Mitigation:** Validate URLs and restrict protocols to HTTP/HTTPS.
 
 7. **Unrestricted File Upload**
    - **Category:** Broken Access Control (OWASP Top 10 - A01:2021)
    - **File:** `signup.php`
    - **Exploit:** Upload of PHP scripts allows remote code execution.
-   - **Mitigation:** Validate file types and restrict uploads to images only.
 
-8. **Path Traversal**
+9. **Path Traversal**
    - **Category:** Broken Access Control (OWASP Top 10 2021 - A01:2021)
    - **File:** `export_news.php`
    - **Exploit:** Directory traversal via `../` sequences in user input.
-   - **Mitigation:** Use `realpath()` and `basename()` to sanitize file paths.
+
+## Database Configuration
+
+- **URL:** `http://localhost:8081/index.php`
+- **Credentials:**
+  - Admin:
+    - **Username:** `admin`
+    - **Password:** `123456`
+  - User:
+    - **Username:** `user123`
+    - **Password:** `123456`
+
+### Tables
+1. **Users**
+   - Stores user credentials, profile pictures, and roles.
+   - Fields: `user_id`, `username`, `password` (hashed), `email`, `role`, `profile_picture`, `created_at`.
+2. **Comments**
+   - Holds user-generated comments linked to news articles.
+   - Fields: `comment_id`, `news_url`, `user_id`, `comment`, `created_at`.
+3. **Subscribers**
+   - Contains newsletter subscriber information.
+   - Fields: `subscriber_id`, `email`, `created_at`.
+
+---
+
+## References
+
+- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)
+- [Cross-Site Scripting Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+- [SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)
+- [Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
+- [Server-Side Request Forgery Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)
+- [File Upload Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html)
+- [Path Traversal Prevention](https://owasp.org/www-community/attacks/Path_Traversal)
