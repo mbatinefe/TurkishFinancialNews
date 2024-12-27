@@ -1,4 +1,4 @@
-# Vulnerable Website Project
+# Patched Website Project against Vulnerabilities
 
 This project demonstrates a variety of common web application vulnerabilities. It includes examples of unpatched and patched code for educational purposes. The aim is to showcase potential exploits and how to mitigate them effectively.
 
