@@ -160,15 +160,13 @@ This project simulates a Turkish financial news website with several intentional
 ### Tables
 1. **Users**
    - Stores user credentials, profile pictures, and roles.
-   - Fields: `user_id`, `username`, `password` (hashed), `email`, `role`, `profile_picture`, `created_at`.
+   - Fields: `user_id`, `username`, `password` (not hashed), `email`, `role`, `profile_picture`, `created_at`.
 2. **Comments**
    - Holds user-generated comments linked to news articles.
    - Fields: `comment_id`, `news_url`, `user_id`, `comment`, `created_at`.
 3. **Subscribers**
    - Contains newsletter subscriber information.
    - Fields: `subscriber_id`, `email`, `created_at`.
-
----
 
 ## References
 
