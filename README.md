@@ -22,7 +22,6 @@ This repository contains a demonstration of common web application vulnerabiliti
      - Path Traversal (CWE-35)
    - This folder is designed for ethical hacking exercises and testing exploitations.
 
----
 
 ## Getting Started
 
@@ -31,7 +30,6 @@ This repository contains a demonstration of common web application vulnerabiliti
 - A web browser
 - Basic understanding of PHP, MySQL, and web security concepts
 
----
 
 ## Key Features
 
@@ -53,7 +51,6 @@ This repository contains a demonstration of common web application vulnerabiliti
   - Step-by-step explanations of each fix.
   - Adherence to OWASP best practices.
 
----
 
 ## References
 
@@ -65,7 +62,6 @@ This repository contains a demonstration of common web application vulnerabiliti
 - [File Upload Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html)
 - [Path Traversal Prevention](https://owasp.org/www-community/attacks/Path_Traversal)
 
----
 
 ## Disclaimer
 
